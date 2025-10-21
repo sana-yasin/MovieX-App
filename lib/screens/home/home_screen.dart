@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moviex/screens/cinema/cinema_location.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/routes/app_routes.dart';
 import '../../models/movie.dart';
@@ -56,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _onNavBarTap(int index) {
     if (index == _selectedIndex) return; // إذا كان نفس الصفحة، لا تعمل شي
-    
+
     setState(() {
       _selectedIndex = index;
     });
@@ -69,12 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         // Categories - يمكنك إنشاء صفحة Categories لاحقاً
         // Navigator.pushNamed(context, AppRoutes.categories);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Categories coming soon!')),
-        );
-        setState(() {
-          _selectedIndex = 0; // رجع للـ Home
-        });
+
         break;
       case 2:
         // Tickets - الانتقال لصفحة My Tickets
@@ -116,204 +112,212 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : RefreshIndicator(
-                onRefresh: _loadMovies,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 24,
-                              backgroundImage: NetworkImage(
-                                'https://ui-avatars.com/api/?name=User&size=200&background=FF5524&color=fff',
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Your Location',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.textSecondary,
-                                    ),
+        child: _selectedIndex == 1
+            ? CinimaPage()
+            : _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : RefreshIndicator(
+                    onRefresh: _loadMovies,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Header
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 24,
+                                  backgroundImage: NetworkImage(
+                                    'https://ui-avatars.com/api/?name=User&size=200&background=FF5524&color=fff',
                                   ),
-                                  Row(
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'New York',
+                                        'Your Location',
                                         style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.textPrimary,
+                                          fontSize: 12,
+                                          color: AppColors.textSecondary,
                                         ),
                                       ),
-                                      const SizedBox(width: 4),
-                                      Icon(
-                                        Icons.keyboard_arrow_down,
-                                        color: AppColors.primary,
-                                        size: 20,
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'New York',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.textPrimary,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Icon(
+                                            Icons.keyboard_arrow_down,
+                                            color: AppColors.primary,
+                                            size: 20,
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.notifications_outlined,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Banner
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: MovieBanner(
-                          movies: _popularMovies,
-                          onMovieTap: _navigateToMovieDetails,
-                        ),
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Now Playing Section
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Now Playing',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {},
-                              child: Row(
-                                children: const [
-                                  Text(
-                                    'View All',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primary,
-                                    ),
+                                ),
+                                IconButton(
+                                  onPressed: () {},
+                                  icon: const Icon(
+                                    Icons.notifications_outlined,
+                                    color: AppColors.textPrimary,
                                   ),
-                                  SizedBox(width: 4),
-                                  Icon(
-                                    Icons.arrow_forward_ios,
-                                    size: 14,
-                                    color: AppColors.primary,
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
 
-                      const SizedBox(height: 12),
-
-                      // Now Playing Movies List
-                      SizedBox(
-                        height: 300,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: _nowPlayingMovies.length,
-                          itemBuilder: (context, index) {
-                            return MovieCard(
-                              movie: _nowPlayingMovies[index],
-                              onTap: () => _navigateToMovieDetails(
-                                  _nowPlayingMovies[index]),
-                            );
-                          },
-                        ),
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Coming Soon Section
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Coming Soon',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                              ),
+                          // Banner
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: MovieBanner(
+                              movies: _popularMovies,
+                              onMovieTap: _navigateToMovieDetails,
                             ),
-                            TextButton(
-                              onPressed: () {},
-                              child: Row(
-                                children: const [
-                                  Text(
-                                    'View All',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primary,
-                                    ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // Now Playing Section
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Now Playing',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
                                   ),
-                                  SizedBox(width: 4),
-                                  Icon(
-                                    Icons.arrow_forward_ios,
-                                    size: 14,
-                                    color: AppColors.primary,
+                                ),
+                                TextButton(
+                                  onPressed: () {},
+                                  child: Row(
+                                    children: const [
+                                      Text(
+                                        'View All',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                      SizedBox(width: 4),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        size: 14,
+                                        color: AppColors.primary,
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          // Now Playing Movies List
+                          SizedBox(
+                            height: 300,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              itemCount: _nowPlayingMovies.length,
+                              itemBuilder: (context, index) {
+                                return MovieCard(
+                                  movie: _nowPlayingMovies[index],
+                                  onTap: () => _navigateToMovieDetails(
+                                      _nowPlayingMovies[index]),
+                                );
+                              },
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // Coming Soon Section
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Coming Soon',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {},
+                                  child: Row(
+                                    children: const [
+                                      Text(
+                                        'View All',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                      SizedBox(width: 4),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        size: 14,
+                                        color: AppColors.primary,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          // Coming Soon Movies List
+                          SizedBox(
+                            height: 300,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              itemCount: _upcomingMovies.length,
+                              itemBuilder: (context, index) {
+                                return MovieCard(
+                                  movie: _upcomingMovies[index],
+                                  onTap: () => _navigateToMovieDetails(
+                                      _upcomingMovies[index]),
+                                );
+                              },
+                            ),
+                          ),
+
+                          const SizedBox(height: 80),
+                        ],
                       ),
-
-                      const SizedBox(height: 12),
-
-                      // Coming Soon Movies List
-                      SizedBox(
-                        height: 300,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: _upcomingMovies.length,
-                          itemBuilder: (context, index) {
-                            return MovieCard(
-                              movie: _upcomingMovies[index],
-                              onTap: () => _navigateToMovieDetails(
-                                  _upcomingMovies[index]),
-                            );
-                          },
-                        ),
-                      ),
-
-                      const SizedBox(height: 80),
-                    ],
+                    ),
                   ),
-                ),
-              ),
       ),
 
       // Bottom Navigation Bar

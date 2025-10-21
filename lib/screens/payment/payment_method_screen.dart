@@ -3,6 +3,8 @@ import '../../core/constants/app_colors.dart';
 import '../../core/routes/app_routes.dart';
 import '../../models/movie.dart';
 import '../../widgets/common/custom_button.dart';
+import '../../services/ticket_manager.dart';
+import '../../models/ticket.dart';
 
 class PaymentMethodScreen extends StatefulWidget {
   final Map<String, dynamic>? bookingData;
@@ -67,6 +69,22 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
     final selectedPackage =
         widget.bookingData?['selectedPackage'] as String? ?? 'Standard';
     final totalPrice = widget.bookingData?['totalPrice'] as double? ?? 50.0;
+    final showDateTime = _parseDateTime(selectedDate, selectedTime);
+
+    if (movie != null) {
+    final ticket = Ticket(
+      bookingId: bookingId,
+      transactionId: transactionId,
+      referenceId: referenceId,
+      movie: movie,
+      selectedSeats: selectedSeats,
+      showDateTime: showDateTime,
+      selectedPackage: selectedPackage,
+      totalPrice: totalPrice,
+    );
+    
+    TicketManager().addTicket(ticket); // حفظ التذكرة
+  }
 
     showDialog(
       context: context,
@@ -207,6 +225,32 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
       ),
     );
   }
+
+  // دالة مساعدة لتحويل النص إلى DateTime
+DateTime _parseDateTime(String date, String time) {
+  try {
+    // مثال: "Dec 22, 2023" و "17:30 - 20:38"
+    final dateParts = date.split(' ');
+    final months = {
+      'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
+      'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12
+    };
+    
+    final month = months[dateParts[0]] ?? 1;
+    final day = int.parse(dateParts[1].replaceAll(',', ''));
+    final year = int.parse(dateParts[2]);
+    
+    final timeParts = time.split(' - ')[0].split(':');
+    final hour = int.parse(timeParts[0]);
+    final minute = int.parse(timeParts[1]);
+    
+    return DateTime(year, month, day, hour, minute);
+  } catch (e) {
+    return DateTime.now();
+  }
+}
+
+
 
   Widget _buildDot() {
     return Container(

@@ -11,6 +11,7 @@ import '../../screens/review_summary/review_summary_screen.dart';
 import '../../screens/payment/payment_method_screen.dart';
 import '../../models/movie.dart';
 import '../../screens/ticket/ticket_screen.dart';
+import '../../screens/ticket/my_tickets_screen.dart';
 
 class AppRoutes {
   // Route Names
@@ -26,6 +27,7 @@ class AppRoutes {
   static const String reviewSummary = '/review-summary';
   static const String payment = '/payment';
   static const String ticket = '/ticket';
+  static const String myTickets = '/my-tickets';
 
   // Route Generator
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -90,6 +92,18 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (_) => PaymentMethodScreen(bookingData: bookingData),
         );
+
+      case ticket: // أضف هذا الـ case
+        return MaterialPageRoute(
+          builder: (_) => const TicketScreen(),
+          settings: settings, // مهم: لتمرير الـ arguments
+        );
+
+        case myTickets:
+        return MaterialPageRoute(
+          builder: (_) => const MyTicketsScreen());
+
+      
 
       default:
         return MaterialPageRoute(
